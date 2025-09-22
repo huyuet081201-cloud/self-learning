@@ -104,3 +104,62 @@ spec:
 - Spec: we provide additional information to Kubernetes pertaining to that object. Spec is a dictionary. 
 
 ### 7. Replication Controller
+- Help to run multiple instances of a single pod in Kubernetes cluster, thus providing high availability.
+- Use to create multiple pods to share the load across them.
+- Replication Controller is old technology that is being replaced by replica set.
+- ReplicaSet can also manage pods that were not created as part of the replica set creation.
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myapp-replicaset
+  labels:
+    appp: myapp
+    type: front-end
+spec:
+  template:
+    metadata: 
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+  replicas: 3
+  selector: (help the replica set identify what pods fall under it)
+    matchLabels:
+      type: front-end 
+```
+
+#### Labels and selectors
+- Labels as the filter for the replicaset know which pods need be monitored.
+- Under the selector section, we use the match labels filter and provide the same label that wee used while creating the pods.
+--> This way, the replicaset knows which pods to monitor
+
+- Scale:
+  - Method 1: update replicas in the replicaset file, then use command `kubectl create -f <replicaset.yml>`
+  - Method 2: Use command `kubectl scale --replicas=6 -f <replicaset.yml>`
+
+
+![replicaset_command](/images/replicaset_command.png)
+
+
+
+### 8. Deployments
+
+![deployment](/images/depoyment.png)
+
+
+- The deployment provides us with the capability to upgrade the underlying instances seamlessly using rolling updates, undo changes, pause and resume changes as required.
+
+- File definition deployment is similar to ReplicasSet, change the kind to Deployment.
+- When apply file deployment, new K8s object is created
+
+- Some Tips:
+  - Generate deployment YAML file. Don't create it and save it to file: `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml`
+
+### 9. Services
+
